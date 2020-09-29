@@ -17,3 +17,6 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """
 
     raise NotImplementedError
+
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
+    raise NotImplementedError
