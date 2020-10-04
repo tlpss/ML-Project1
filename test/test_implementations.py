@@ -31,10 +31,23 @@ class TestImplementations(unittest.TestCase):
 
     def test_SGD(self):
         w, loss = least_squares_SGD(self.y, self.tX, np.array([0,0,0]), 50, 0.1, 100)
-        print(w)
+        #print(w)
         diff = w - self.w
-        print(diff)
+        #print(diff)
         self.assertTrue(np.dot(diff,diff.T) < 0.01) # should not be too far from "exact weight vector"
 
+    def test_normal_least_squares(self):
+        w, loss = normal_least_squares(self.y,self.tX)
+        diff = w - self.w
+        #print(w)
+        self.assertTrue(np.dot(diff,diff.T) < 0.01) # should not be too far from "exact weight vector"
 
+    def test_ridge_extremes(self):
+        w,loss = ridge_regression(self.y, self.tX,100000000)
+        #print(w)
+        self.assertTrue(np.dot(w,w.T) < 0.001)
+        w, loss = ridge_regression(self.y, self.tX, 0)
+        diff = w - self.w
+        #print(w)
+        self.assertTrue(np.dot(diff,diff.T) < 0.01) # should not be too far from "exact weight vector"
 

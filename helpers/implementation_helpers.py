@@ -26,6 +26,22 @@ def compute_mse(y, tx, w):
     
     return loss
 
+def compute_ridge_loss(y , tx ,w , lambda_):
+    """
+    implements the ridge regression loss function
+    :param y: labels
+    :type y: numpy array
+    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each column a feature
+    :type tx: numpy 2D array
+    :param lambda_: Regularizer
+    :type lambda_: float64
+
+    :return: loss value
+    :rtype:  float64
+    
+    """
+    return compute_mse(y, tx, w) + lambda_* np.sum(w**2 , axis=0)
+
 def compute_gradient(y, tx, w):
     """
     computes the gradient using vector computation

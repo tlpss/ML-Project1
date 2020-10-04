@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient 
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
@@ -79,34 +79,6 @@ def normal_least_squares(y, tx):
     
     return w , mse
 
-
-def RMSE(mse):
-    """
-    Calculates RMSE from MSE
-    :param mse: mean square error function
-    :type y: float64
-    
-    :return: loss value
-    :rtype:  float64
-    
-    """
-    return np.sqrt(2*mse)
-
-def compute_ridge_loss(y , tx ,w , lambda_):
-    """
-    implements the ridge regression loss function
-    :param y: labels
-    :type y: numpy array
-    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each column a feature
-    :type tx: numpy 2D array
-    :param lambda_: Regularizer
-    :type lambda_: float64
-
-    :return: loss value
-    :rtype:  float64
-    
-    """
-     return compute_mse(y, tx, w) + lambda_* np.sum(w**2 , axis=0)
     
 def ridge_regression(y, tx, lambda_):
     """
