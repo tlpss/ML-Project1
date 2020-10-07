@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_loss, 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
@@ -136,7 +136,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     w = np.zeros(D)
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_gradient(y, tx, w)
+        gradient = compute_sigmoid_gradient(y, tx, w)
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function

@@ -117,7 +117,7 @@ def hypothesis_gradient(tx,h):
     return gradient
     
 
-def compute_gradient(y, tx, w, lambda_ = 0):
+def compute_sigmoid_gradient(y, tx, w, lambda_ = 0):
     """
     Function calculates the value of the gradient at the point tx
     
