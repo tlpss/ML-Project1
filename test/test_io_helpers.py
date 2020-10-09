@@ -17,6 +17,8 @@ class TestHelpers(unittest.TestCase):
         #print(data)
         #print(data.dtype)
 
+    def test_load_predict_data(self):
+        data = load_csv('test/unlabeled_dummy.csv')
 
     def test_split_data(self):
         data = load_csv(self.path)

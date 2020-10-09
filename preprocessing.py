@@ -17,7 +17,7 @@ class Preprocessing:
         self.y = None
         self.tX = None
 
-    def preprocess(self, replace_missing_by_mean = True, outlier_removal = False, save_y_and_tX = False ):
+    def preprocess(self, replace_missing_by_mean = True, outlier_removal = False, save_y_and_tX = False, labeled = True):
         """
         performs the steps in the pipepline
 
@@ -25,9 +25,12 @@ class Preprocessing:
         :return: y, tX (extended!)
         :rtype: numpy array, 2D-numpy array 
         """
-        self._split_predictions_and_make_unstructured()
+        self._split_predictions_and_make_unstructured(labeled=labeled)
         if replace_missing_by_mean:
             self._replace_missing_by_mean()
+        
+        self._feature_engineering()
+
         if outlier_removal:
             self._remove_outliers()
         self._normalize_columns()
@@ -39,10 +42,18 @@ class Preprocessing:
         return self.y, self.tX
 
 
-    def _split_predictions_and_make_unstructured(self):
-        self.y  = self.dataset["Prediction"]
-        self.dataset = np.array(self.dataset.tolist()) # make unstructured, not very efficient..
-        self.dataset = self.dataset[:,2:] # filter out id and prediction
+    def _split_predictions_and_make_unstructured(self, labeled):
+        if labeled:
+            self.y  = self.dataset["Prediction"]
+            self.dataset = np.array(self.dataset.tolist()) # make unstructured, not very efficient..
+            self.dataset = self.dataset[:,2:] # filter out id and prediction
+        else:
+            print("prediction data")
+            self.y = self.dataset["Id"] # store IDs
+            self.dataset = np.array(self.dataset.tolist()) # make unstructured, not very efficient..
+            self.dataset = self.dataset[:,2:] # remove IDs and '?' of predictions
+            print(self.dataset)
+
     
     def _replace_missing_by_mean(self):
         # create masked ndarray to discard missing values
@@ -67,6 +78,10 @@ class Preprocessing:
     def _remove_outliers(self):
         raise NotImplementedError
 
+    def _feature_engineering(self):
+        ''' Method to be implemented by subclasses'''
+        pass
+
     def _normalize_columns(self):
         self.dataset = (self.dataset- np.mean(self.dataset, axis = 0)) / np.std(self.dataset, axis = 0)
 
@@ -78,6 +93,9 @@ if __name__ == "__main__":
     """ example usage"""
     
     from helpers.io_helpers import load_csv
-    p = Preprocessing(load_csv("dataset/trainset.csv"))
-    y, tX = p.preprocess()
+    #p = Preprocessing(load_csv("dataset/trainset.csv"))
+    #y, tX = p.preprocess()
+    p = Preprocessing(load_csv("dataset/unlabeled_test_0.csv", converters={}))
+    ids, tX = p.preprocess(labeled=False)
+
     
