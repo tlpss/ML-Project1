@@ -131,7 +131,7 @@ def compute_sigmoid_gradient(y, tx, w, lambda_ = 0):
     :type w: numpy 1D array
     
     :return: the gradient at the particular point tx and label y
-    :rtype:  float64
+    :rtype:  numpy 1D array
     
     """
     N,D = np.shape(tx)
