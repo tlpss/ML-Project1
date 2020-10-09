@@ -1,5 +1,5 @@
 import numpy as np
-
+import csv 
 def load_csv(dataset_path, delimiter = ",", usecols = None, converters=None):
     """
     creates a structured numpy array from a csv file
@@ -48,6 +48,8 @@ def split_dataset(dataset, test_ratio = 0.1):
 
 def write_csv(data, filename):
     """
+    GIVEN FUNCTION 
+    
     writes a structured numpy array into a csv, datatypes should be only integers or floats
     floats are formatted using 3 decimal values
 
@@ -72,6 +74,23 @@ def write_csv(data, filename):
 
     np.savetxt(filename, data, delimiter=',', header=header, fmt=fmt, comments="")
 
+def create_csv_submission(ids, y_pred, name):
+    """
+    Creates an output file in csv format for submission to kaggle
+    Arguments: ids (event ids associated with each prediction)
+               y_pred (predicted class labels): 0 for background & 1 for higgs
+               name (string name of .csv output file to be created)
+
+    labels will be converted to 1, -1 as required for the platform
+    """
+
+    y_pred = 2* y_pred -1 #convert to -1,1
+    with open(name, 'w') as csvfile:
+        fieldnames = ['Id', 'Prediction']
+        writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
+        writer.writeheader()
+        for r1, r2 in zip(ids, y_pred):
+            writer.writerow({'Id':int(r1),'Prediction':int(r2)})
 
 if __name__ == "__main__":
     """

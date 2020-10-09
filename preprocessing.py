@@ -52,7 +52,6 @@ class Preprocessing:
             self.y = self.dataset["Id"] # store IDs
             self.dataset = np.array(self.dataset.tolist()) # make unstructured, not very efficient..
             self.dataset = self.dataset[:,2:] # remove IDs and '?' of predictions
-            print(self.dataset)
 
     
     def _replace_missing_by_mean(self):
