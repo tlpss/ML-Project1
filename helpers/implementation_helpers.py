@@ -143,6 +143,7 @@ def compute_sigmoid_gradient(y, tx, w, lambda_ = 0):
     # total number of labels
     N = len(y)
     gradient = - np.matmul(np.transpose(hypothesis_gradient(tx,h)),e)/N + 2 * lambda_ * w
+    
     return gradient
 
 def compute_loss(y, tx, w, lambda_ = 0, MSE = True):
@@ -173,3 +174,24 @@ def compute_loss(y, tx, w, lambda_ = 0, MSE = True):
     else:
         #MAE
         return np.sum(np.abs(e))/ (2*N) + lambda_ * np.sum(np.abs(w))
+    
+def basic_split_data(x, y, ratio, seed):
+    """
+    split the dataset based on the split ratio. If ratio is 0.8 
+    you will have 80% of your data set dedicated to training 
+    and the rest dedicated to testing
+    """
+    # set seed
+    np.random.seed(seed)
+    
+    permutated_indices = np.random.permutation(len(y))
+    
+    test_len = int(len(y)*ratio)
+    
+    x_train = x[permutated_indices[: test_len]]
+    x_test  = x[permutated_indices[test_len :]]
+    y_train = y[permutated_indices[: test_len]]
+    y_test  = y[permutated_indices[test_len :]]
+    
+    return x_test , x_train ,y_test , y_train
+    

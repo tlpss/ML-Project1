@@ -50,4 +50,14 @@ class TestImplementations(unittest.TestCase):
         diff = w - self.w
         #print(w)
         self.assertTrue(np.dot(diff,diff.T) < 0.01) # should not be too far from "exact weight vector"
+        
+    def test_reg_logistic_regression_extremes(self):
+        w,loss = reg_logistic_regression(self.y, self.tx, 0,np.array([0,0,0]), 50, 0.1)
+        diff = w- w.self
+        self.assertTrue(np.dot(diff,diff.T) <0.01) # should not be too far from "exact weight vector"
+        
+        w,loss = reg_logistic_regression(self.y, self.tx, 100000000,np.array([0,0,0]), 50, 0.1)
+        self.assertTrue(np.dot(w,w.T) < 0.001)
+        
+        
 

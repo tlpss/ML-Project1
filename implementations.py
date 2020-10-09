@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_loss, 
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_loss
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
@@ -133,7 +133,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     D = np.shape(tx)[1]
     # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
-    w = np.zeros(D)
+    w = initial_w
     for n_iter in range(max_iters):
         # compute the gradient at the given point
         gradient = compute_sigmoid_gradient(y, tx, w)
@@ -141,7 +141,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         w = w - gamma * gradient
     # calculate loss function
     loss = compute_loss(y, tx, w)
-    return loss, w
+    return w, loss
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """
@@ -178,9 +178,55 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     w = np.zeros(D)
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_gradient(y, tx, w, lambda_)
+        gradient = compute_sigmoid_gradient(y, tx, w, lambda_)
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
     loss = compute_loss(y, tx, w, lambda_)
-    return loss, w
+    return w, loss
+
+def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size):
+    """
+    #Regularized logistic regression using gradient descent
+    
+    :param y: labels
+    :type y: numpy 1D array
+    
+    :param lambda_: trade-off parameter (how big part of the loss/cost function to give to regularization function)
+    :type lambda_: float64
+    
+    
+    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
+    :type tx: numpy 2D array
+    
+    :param initial_w: initial value of weights
+    :type initial_w: numpy 1D array
+    
+    :param max_iters: the number of maximal iterations
+    :type max_iters: int
+    
+    :param gamma: learning rate
+    :type gamma: float64
+    
+    :return: ws (), losses (the value of the loss function at the end of learning)
+    :rtype:  numpy array,  float64
+    
+    """
+    n = len(y)
+    
+    # number of features
+    D = np.shape(tx)[1]
+    # Define parameters to store weights and the value of the loss(cost) funcion
+    loss = 0.0
+    w = np.zeros(D)
+    for n_iter in range(max_iters):
+        batch_indices = np.random.randint(n,size=batch_size)
+        batch_y = y[batch_indices]
+        batch_tx = tx[batch_indices]
+        # compute the gradient at the given point
+        gradient = compute_sigmoid_gradient(batch_y, batch_tx, w, lambda_)
+        # update weights accordint to the BGD
+        w = w - gamma * gradient
+    # calculate loss function
+    loss = compute_loss(y, tx, w, lambda_)
+    return w, loss
