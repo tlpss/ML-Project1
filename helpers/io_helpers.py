@@ -49,7 +49,7 @@ def split_dataset(dataset, test_ratio = 0.1):
 def write_csv(data, filename):
     """
     GIVEN FUNCTION 
-    
+
     writes a structured numpy array into a csv, datatypes should be only integers or floats
     floats are formatted using 3 decimal values
 
@@ -84,10 +84,12 @@ def create_csv_submission(ids, y_pred, name):
     labels will be converted to 1, -1 as required for the platform
     """
 
-    y_pred = 2* y_pred -1 #convert to -1,1
     with open(name, 'w') as csvfile:
         fieldnames = ['Id', 'Prediction']
-        writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
+
+        y_pred = 2* np.array(y_pred) -1 #convert to -1,1
+
+        writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
