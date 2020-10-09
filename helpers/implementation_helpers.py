@@ -1,5 +1,9 @@
 import numpy as np
 
+'''
+LINEAR REGRESSION HELPERS
+'''
+
 def compute_mse(y, tx, w):
     """
     calculates MSE loss 
@@ -65,7 +69,12 @@ def compute_gradient(y, tx, w):
     gradient = np.dot(tx.T,e)
     gradient *= -1/ y.shape[0]
     return np.array(gradient).flatten()
-    
+
+
+'''
+LOGISTIC REGRESSION HELPERS
+'''
+
 def calculate_sigmoid(w,tx_ith_point):
     """
     Function calculates the value of sigmoid function at the dot product between w and tx
@@ -146,9 +155,9 @@ def compute_sigmoid_gradient(y, tx, w, lambda_ = 0):
     
     return gradient
 
-def compute_loss(y, tx, w, lambda_ = 0, MSE = True):
+def compute_logistic_regression_loss(y, tx, w, lambda_ = 0, MSE = True):
     """
-    Function calculates the value of the loss function at the point tx, how much the hypothesis differes form y label vector
+    Function calculates the value of the loss function for linear regression at the point tx, how much the hypothesis differes form y label vector
     
     :param y: labels
     :type y: numpy 1D array
@@ -175,23 +184,4 @@ def compute_loss(y, tx, w, lambda_ = 0, MSE = True):
         #MAE
         return np.sum(np.abs(e))/ (2*N) + lambda_ * np.sum(np.abs(w))
     
-def basic_split_data(x, y, ratio, seed):
-    """
-    split the dataset based on the split ratio. If ratio is 0.8 
-    you will have 80% of your data set dedicated to training 
-    and the rest dedicated to testing
-    """
-    # set seed
-    np.random.seed(seed)
-    
-    permutated_indices = np.random.permutation(len(y))
-    
-    test_len = int(len(y)*ratio)
-    
-    x_train = x[permutated_indices[: test_len]]
-    x_test  = x[permutated_indices[test_len :]]
-    y_train = y[permutated_indices[: test_len]]
-    y_test  = y[permutated_indices[test_len :]]
-    
-    return x_test , x_train ,y_test , y_train
     

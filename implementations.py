@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_loss
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_logistic_regression_loss
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
@@ -140,7 +140,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_loss(y, tx, w)
+    loss = compute_logistic_regression_loss(y, tx, w)
     return w, loss
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -182,7 +182,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_loss(y, tx, w, lambda_)
+    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
     return w, loss
 
 def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size):
@@ -228,5 +228,5 @@ def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, b
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_loss(y, tx, w, lambda_)
+    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
     return w, loss
