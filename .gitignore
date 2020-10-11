@@ -3,3 +3,5 @@
 .ipynb_checkpoints
 **.png
 venv/
+
+test/test_write.csv
