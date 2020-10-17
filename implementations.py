@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_logistic_regression_loss
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, sigmoid, gradient_of_logistic_regression, loss_of_logistic_regression
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
