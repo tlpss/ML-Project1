@@ -140,9 +140,9 @@ def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
     
     """
     # linear regression
-    lin_reg = np.exp(np.matmul(tx,w)) 
+    lin_reg = np.matmul(tx,w) 
     # log part of loss function
-    log_lin_reg = np.log(1 + lin_reg) 
+    log_lin_reg = np.logaddexp(0,lin_reg)  #  = log(1+ exp(lin_reg)) but avoids numerical instability issues
     # linear part of loss function
     # where y_i is zero that doesnt have any effect on the loss
     # where y_i is one that we subtract linear regression part
