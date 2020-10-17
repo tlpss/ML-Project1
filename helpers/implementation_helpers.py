@@ -88,7 +88,6 @@ def sigmoid(x):
     """
     return 1/(1 + np.exp(-x))
 
-# NEWLY ADDED FUNCTION 2/3 FOR LOGISTIC REGRESSION
 def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     """
     Function calculates the value of the gradient of the loss function for every
@@ -116,7 +115,7 @@ def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     lin_reg = np.matmul(tx,w) # linear regression for every data point in tx
     hypothesis_vector = sigmoid(lin_reg) # just sigmoid applied to every entry of linear regression
     # calculate gradient vector with regularization (of course if lambda_ == 0 then it is without regularization)
-    gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector) + 2 * lambda_ * w
+    gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector-y) + 2 * lambda_ * w
     return gradient_vector
 
 # NEWLY ADDED FUNCTION 3/3 FOR LOGISTIC REGRESSION
