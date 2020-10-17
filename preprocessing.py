@@ -29,11 +29,11 @@ class Preprocessing:
         if replace_missing_by_mean:
             self._replace_missing_by_mean()
         
-        self._feature_engineering()
+        self._standardize_columns()
 
+        self._feature_engineering()
         if outlier_removal:
             self._remove_outliers()
-        self._normalize_columns()
         self._add_bias_column_and_create_tX()
 
         if save_y_and_tX:
@@ -81,7 +81,7 @@ class Preprocessing:
         ''' Method to be implemented by subclasses'''
         pass
 
-    def _normalize_columns(self):
+    def _standardize_columns(self):
         self.dataset = (self.dataset- np.mean(self.dataset, axis = 0)) / np.std(self.dataset, axis = 0)
 
     def _add_bias_column_and_create_tX(self):
