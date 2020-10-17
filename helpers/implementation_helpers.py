@@ -118,7 +118,6 @@ def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector-y) + 2 * lambda_ * w
     return gradient_vector
 
-# NEWLY ADDED FUNCTION 3/3 FOR LOGISTIC REGRESSION
 def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
     """
     Function calculates the value of the loss function for linear regression at the point tx
@@ -141,7 +140,7 @@ def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
     
     """
     # linear regression
-    lin_reg = np.matmul(tx,w) 
+    lin_reg = np.exp(np.matmul(tx,w)) 
     # log part of loss function
     log_lin_reg = np.log(1 + lin_reg) 
     # linear part of loss function
