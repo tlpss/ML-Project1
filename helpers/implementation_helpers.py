@@ -75,113 +75,79 @@ def compute_gradient(y, tx, w):
 LOGISTIC REGRESSION HELPERS
 '''
 
-def calculate_sigmoid(w,tx_ith_point):
+def sigmoid(x):
     """
-    Function calculates the value of sigmoid function at the dot product between w and tx
+    Function calculates the value of sigmoid function on the data structure x
     
-    :param w: extended weights from linear regression
-    :type w: numpy 1D array
+    :param x: usulally this is X^T * w
+    :type x: scalar or numpy 1D array or numpy 2D array
     
-    :param tx: i-th point of extended feature matrix
-    :type tx: numpy 1D array
-    
-    :return: value of sigmoid function for that particular w and tx
+    :return: value of sigmoid function for that particular x
     :rtype:  float64
     
     """
-    #inner product of two vectors
-    inner_product = np.dot(w,tx_ith_point)
-    # sigmoid function
-    return 1/(1 + np.exp(-inner_product))
+    return 1/(1 + np.exp(-x))
 
-def hypothesis_gradient(tx,h):
+# NEWLY ADDED FUNCTION 2/3 FOR LOGISTIC REGRESSION
+def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     """
-    Function calculates the value of the gradient of the sigmoid function for every
+    Function calculates the value of the gradient of the loss function for every
     i-th point of tx ( i in {0,...,(N-1)} )
     
-    Function return a matrix (Jacobian), because we are taking the gradient of a vector
-    of sigmoid hypothesis for all points
-    
+    Function returns a vector, take a look at lecture 05b in Machine Learning:
+        file name : lecture5b_logistic_regression.pdf --->    https://github.com/epfml/ML_course/blob/master/lectures/05/lecture5b_logistic_regression.pdf
+        page : 10/17
     
     :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
     :type tx: numpy 2D array
     
-    :param h: value of the sigmoid (hypothesis) for the point tx[i] and for the weights w
-        sigmoid_x_i = calculate_sigmoid(w, tx[i]) 
-    :type h: numpy 1D array
-    
-    :return: the gradient at the for every i-th hypothesis ( i in {0,...,(N-1)} )
-    Functions returns the matrix same dimensions as tx matrix, but every i-th row of tx
-    is multiplied by a sigmoid value of i-th hypothesis h[i]
-    :rtype:  float64
-    
-    """
-    N,D = np.shape(tx)
-    gradient = np.ones([N,D])
-    for i in range(N):
-        # set the ith row to the gradient value
-        # gradient value = 
-        # the derivative of the (1D nparray) sigmoid-hypothesis over the (1D nparray) weights w
-        gradient[i] = h[i] * (1-h[i]) * tx[i] 
-    return gradient
-    
-
-def compute_sigmoid_gradient(y, tx, w, lambda_ = 0):
-    """
-    Function calculates the value of the gradient at the point tx
-    
-    :param y: labels
+    :param y: binary labels of our data
     :type y: numpy 1D array
     
-    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
-    :type tx: numpy 2D array
-    
-    :param w: extended weights from linear regression
+    :param w: weight parameters for linear regression for every data point in tx
     :type w: numpy 1D array
     
-    :return: the gradient at the particular point tx and label y
+    
+    :return: the gradient vector for every data point i-th in tx ( i in {0,...,(N-1)} )
+    in the logistic regression
     :rtype:  numpy 1D array
     
     """
-    N,D = np.shape(tx)
-    # linear sigmoid (logistic) hypothesis for every point
-    h = np.array([calculate_sigmoid(w,tx[i]) for i in range(N)])
-    # error vector
-    # how much hypothesis h is different from the given label vector y
-    e = y - h
-    # total number of labels
-    N = len(y)
-    gradient = - np.matmul(np.transpose(hypothesis_gradient(tx,h)),e)/N + 2 * lambda_ * w
-    
-    return gradient
+    lin_reg = np.matmul(tx,w) # linear regression for every data point in tx
+    hypothesis_vector = sigmoid(lin_reg) # just sigmoid applied to every entry of linear regression
+    # calculate gradient vector with regularization (of course if lambda_ == 0 then it is without regularization)
+    gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector) + 2 * lambda_ * w
+    return gradient_vector
 
-def compute_logistic_regression_loss(y, tx, w, lambda_ = 0, MSE = True):
+# NEWLY ADDED FUNCTION 3/3 FOR LOGISTIC REGRESSION
+def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
     """
-    Function calculates the value of the loss function for linear regression at the point tx, how much the hypothesis differes form y label vector
+    Function calculates the value of the loss function for linear regression at the point tx
+    
+    Function returns a number float64, take a look at lecture 05b in Machine Learning:
+        file name : lecture5b_logistic_regression.pdf --->    https://github.com/epfml/ML_course/blob/master/lectures/05/lecture5b_logistic_regression.pdf
+        page : 07/17
     
     :param y: labels
     :type y: numpy 1D array
     
-    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
+    :param tx: extended (contains bias column) feature matrix
     :type tx: numpy 2D array
     
-    :param w: extended weights from linear regression
+    :param w: weights from linear regression
     :type w: numpy 1D array
     
-    :return: the error (the residual) between the model h (hypothesis) and the real value
+    :return: the loss function calculated for every data point in tx and then summed up
     :rtype:  float64
     
     """
-    N,D = np.shape(tx)
-    # linear sigmoid (logistic) hypothesis for every point
-    h = np.array([calculate_sigmoid(w,tx[i]) for i in range(N)])
-    # error vector -- how much hypothesis h is different from the given label vector y
-    e = y - h
-    if (MSE):
-        #MSE
-        return np.dot(e,e)/ (2*N) + lambda_ * np.dot(w,w)
-    else:
-        #MAE
-        return np.sum(np.abs(e))/ (2*N) + lambda_ * np.sum(np.abs(w))
-    
-    
+    # linear regression
+    lin_reg = np.matmul(tx,w) 
+    # log part of loss function
+    log_lin_reg = np.log(1 + lin_reg) 
+    # linear part of loss function
+    # where y_i is zero that doesnt have any effect on the loss
+    # where y_i is one that we subtract linear regression part
+    y_lin_reg = y * lin_reg 
+    loss = np.sum(log_lin_reg - y_lin_reg)
+    return loss

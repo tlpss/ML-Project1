@@ -128,19 +128,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     :rtype:  numpy array,  float64
     
     """
-    
-    # number of features
-    D = np.shape(tx)[1]
-    # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
     w = initial_w
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(y, tx, w)
-        # update weights accordint to the BGD
+        gradient = gradient_of_logistic_regression(tx,y,w)
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w)
+    loss = loss_of_logistic_regression(tx,y,w)
     return w, loss
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -170,19 +165,17 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     :rtype:  numpy array,  float64
     
     """
-    
-    # number of features
-    D = np.shape(tx)[1]
+
     # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
-    w = np.zeros(D)
+    w = initial_w
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(y, tx, w, lambda_)
+        gradient = gradient_of_logistic_regression(tx,y,w,lambda_)
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
+    loss = loss_of_logistic_regression(tx,y,w,lambda_)
     return w, loss
 
 def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size):
@@ -213,20 +206,17 @@ def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, b
     
     """
     n = len(y)
-    
-    # number of features
-    D = np.shape(tx)[1]
     # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
-    w = np.zeros(D)
+    w = initial_w
     for n_iter in range(max_iters):
         batch_indices = np.random.randint(n,size=batch_size)
         batch_y = y[batch_indices]
         batch_tx = tx[batch_indices]
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(batch_y, batch_tx, w, lambda_)
+        gradient = gradient_of_logistic_regression(batch_tx,batch_y,w,lambda_)
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
+    loss = loss_of_logistic_regression(tx,y,w,lambda_)
     return w, loss
