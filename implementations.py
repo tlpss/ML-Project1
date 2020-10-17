@@ -105,7 +105,7 @@ def ridge_regression(y, tx, lambda_):
     
     return w_ridge , ridge_mse
     
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     """
     #Logistic regression using gradient descent
     
@@ -130,12 +130,17 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """
     loss = 0.0
     w = initial_w
+    losses = [] 
     for n_iter in range(max_iters):
         # compute the gradient at the given point
         gradient = gradient_of_logistic_regression(tx,y,w)
         w = w - gamma * gradient
+        losses.append(loss_of_logistic_regression(tx,y,w))
     # calculate loss function
     loss = loss_of_logistic_regression(tx,y,w)
+    
+    if all_losses:
+        return w, losses
     return w, loss
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
