@@ -144,7 +144,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     return w, loss
 def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_losses= False, return_total_number_of_iterations = False):
     """
-    #Logistic regression using gradient descent
+    #Logistic regression using gradient descent with smart feature,
+    that will stop if the absolute difference of two consecutive values
+    of the loss function is smaller than desired argument called epsilon
     
     :param y: labels
     :type y: numpy 1D array
@@ -243,6 +245,68 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, all_los
         return w, losses
     
     return w, loss
+
+def reg_logistic_regression_smart(y, tx, lambda_, initial_w, max_iters, gamma, epsilon, all_losses= False, return_total_number_of_iterations = False):
+    """
+    #Reg. Logistic regression using gradient descent with smart feature,
+    that will stop if the absolute difference of two consecutive values
+    of the loss function is smaller than desired argument called epsilon
+    
+    :param y: labels
+    :type y: numpy 1D array
+    
+    :param lambda_: trade-off parameter (how big part of the loss/cost function to give to regularization function)
+    :type lambda_: float64
+    
+    
+    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
+    :type tx: numpy 2D array
+    
+    :param initial_w: initial value of weights
+    :type initial_w: numpy 1D array
+    
+    :param max_iters: the number of maximal iterations
+    :type max_iters: int
+    
+    :param gamma: learning rate
+    :type gamma: float64
+    
+    :return: ws (), losses (the value of the loss function at the end of learning)
+    :rtype:  numpy array,  float64
+    
+    """
+    loss = 0.0
+    w = initial_w
+    losses = []
+    prev_loss = loss_of_logistic_regression(tx,y,w,lambda_)
+    total_number_of_iteratiorns = max_iters
+    for n_iter in range(max_iters):
+        # compute the gradient at the given point
+        gradient = gradient_of_logistic_regression(tx,y,w,lambda_)
+        # update weights
+        w = w - gamma * gradient
+        # calculate the current value of the loss function
+        current_loss = loss_of_logistic_regression(tx,y,w,lambda_)
+        # save the current value of the loss function
+        losses.append(current_loss)
+        # calculate the differences between two consecutive values
+        # of the loss functions, and if it is less than defined
+        # epsilon then break because we reached desired precision
+        if (abs(current_loss - prev_loss) <= epsilon):
+            total_number_of_iteratiorns = n_iter
+            break
+        prev_loss = current_loss
+    
+    
+    if return_total_number_of_iterations and all_losses:
+        return w, losses, total_number_of_iteratiorns
+    
+    if all_losses:
+        return w, losses
+    else:
+        # calculate the final loss function
+        loss = loss_of_logistic_regression(tx,y,w,lambda_)
+        return w, loss
 
 def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size):
     """
