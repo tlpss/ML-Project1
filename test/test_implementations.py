@@ -71,11 +71,11 @@ class TestImplementations(unittest.TestCase):
         self.assertTrue(mean > 0.97) # accuracy should be very high
 
     def test_confusion_matrix(self):
-        y = np.array([1,1,1,0,0,0])
-        y_hat = np.array([1,1,1,1,0,0])
+        y = np.array([1,1,1,0,0,0,1])
+        y_hat = np.array([1,1,1,1,0,0,1])
 
         c = confusion_matrix(y,y_hat)
-        #print(c)
+        print(c)
         self.assertAlmostEqual(c[0,0],2/3)
         self.assertAlmostEqual(c[1,1],3/3)
         self.assertAlmostEqual(c[0,1],1/3)

@@ -368,5 +368,5 @@ def confusion_matrix(y,y_hat):
     confusion = 2*y + y_hat
     confusion_matrix = [np.count_nonzero(confusion==i) for i in range(4)]
     confusion_matrix = np.array(confusion_matrix).reshape((2,2))
-    confusion_matrix = confusion_matrix/ np.sum(confusion_matrix,axis=1)
+    confusion_matrix = confusion_matrix/ np.sum(confusion_matrix,axis=1).reshape((-1,1))
     return confusion_matrix
