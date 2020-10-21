@@ -50,7 +50,6 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
         batch_tx = tx[batch_indices]
         #compute gradient on batch
         gradient = compute_gradient(batch_y,batch_tx,w)
-        #print(f"gradient = {gradient}")
         # update w
         w = w - gamma*gradient
     
@@ -225,3 +224,22 @@ def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, b
     # calculate loss function
     loss = loss_of_logistic_regression(tx,y,w,lambda_)
     return w, loss
+
+def confusion_matrix(y,y_hat):
+    """
+    returns confusion matrix for the labels and predicitons of a binary classifier
+
+    TN | FP
+    FN | TP 
+
+    where all values are normalized wrt to the occurance of the true labels so that all rows sum up to 1
+
+    :param y: labels of the datapoints (1 or 0)
+    :type y: np 1d array
+    :param y_hat: predicted labels of the datapoints (1 or 0)
+    :type y_hat: np 1d array 
+    """
+
+    confusion = 2*y + y_hat
+    confusion_matrix = [np.count_nonzero(confusion==i) for i in range(4)]
+    return np.array(confusion_matrix).reshape((2,2))/np.sum(confusion_matrix,axis=1)
