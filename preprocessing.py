@@ -28,6 +28,8 @@ class Preprocessing:
         self._split_predictions_and_make_unstructured(labeled=labeled)
         if replace_missing_by_mean:
             self._replace_missing_by_mean()
+            
+        self._feature_transformation()
         
         self._standardize_columns()
 
@@ -76,6 +78,10 @@ class Preprocessing:
 
     def _remove_outliers(self):
         raise NotImplementedError
+    
+    def _feature_transformation(self):
+        ''' Method to be implemented by subclasses'''
+        pass
 
     def _feature_engineering(self):
         ''' Method to be implemented by subclasses'''
