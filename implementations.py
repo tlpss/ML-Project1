@@ -72,7 +72,8 @@ def normal_least_squares(y, tx):
     b = (tx.T).dot(y)
     
     #We solve the linear equation Aw = b
-    w = np.linalg.solve(A,b)
+    #w = np.linalg.solve(A,b)
+    w = np.matmul(np.linalg.pinv(A),b)
     
     mse = compute_mse(y, tx, w)
     
