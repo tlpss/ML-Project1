@@ -86,7 +86,8 @@ def sigmoid(x):
     :rtype:  float64
     
     """
-    return 1/(1 + np.exp(-x))
+    #return 1/(1 + np.exp(-x))
+    return .5 * (1 + np.tanh(.5 * x))
 
 def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     """
