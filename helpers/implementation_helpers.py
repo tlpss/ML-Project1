@@ -117,7 +117,7 @@ def gradient_of_logistic_regression(tx,y,w,lambda_ = 0):
     lin_reg = np.matmul(tx,w) # linear regression for every data point in tx
     hypothesis_vector = sigmoid(lin_reg) # just sigmoid applied to every entry of linear regression
     # calculate gradient vector with regularization (of course if lambda_ == 0 then it is without regularization)
-    gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector-y)/N + 2 * lambda_ * w
+    gradient_vector = np.matmul(np.transpose(tx), hypothesis_vector-y) + 2 * lambda_ * w
     return gradient_vector
 
 def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
@@ -150,5 +150,5 @@ def loss_of_logistic_regression(tx,y,w,lambda_ = 0):
     # where y_i is zero that doesnt have any effect on the loss
     # where y_i is one that we subtract linear regression part
     y_lin_reg = y * lin_reg 
-    loss = np.sum(log_lin_reg - y_lin_reg)/N
+    loss = np.sum(log_lin_reg - y_lin_reg)
     return loss
