@@ -123,8 +123,13 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
+    
+    if all_losses == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
     
     """
     loss = 0.0
@@ -133,8 +138,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     for n_iter in range(max_iters):
         # compute the gradient at the given point
         gradient = gradient_of_logistic_regression(tx,y,w)
+        if all_losses:
+            losses.append(loss_of_logistic_regression(tx,y,w))
         w = w - gamma * gradient
-        losses.append(loss_of_logistic_regression(tx,y,w))
     # calculate loss function
     loss = loss_of_logistic_regression(tx,y,w)
     
@@ -143,7 +149,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     return w, loss
 def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_losses= False, return_total_number_of_iterations = False):
     """
-    #Logistic regression using gradient descent with smart feature,
+    #Logistic regression using gradient descent with smart features,
     that will stop if the absolute difference of two consecutive values
     of the loss function is smaller than desired argument called epsilon
     
@@ -162,8 +168,18 @@ def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_l
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
+    
+    if all_losses == True and return_total_number_of_iterations == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights, 
+    total number of steps before achieving the desired predefined EPSILON precision
+    :rtype:  numpy array,  numpy array, int
     
     """
     loss = 0.0
@@ -174,12 +190,12 @@ def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_l
     for n_iter in range(max_iters):
         # compute the gradient at the given point
         gradient = gradient_of_logistic_regression(tx,y,w)
-        # update weights
-        w = w - gamma * gradient
         # calculate the current value of the loss function
         current_loss = loss_of_logistic_regression(tx,y,w)
         # save the current value of the loss function
         losses.append(current_loss)
+        # update weights
+        w = w - gamma * gradient
         # calculate the differences between two consecutive values
         # of the loss functions, and if it is less than defined
         # epsilon then break because we reached desired precision
@@ -187,8 +203,7 @@ def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_l
             total_number_of_iteratiorns = n_iter
             break
         prev_loss = current_loss
-    
-    
+
     if return_total_number_of_iterations and all_losses:
         return w, losses, total_number_of_iteratiorns
     
@@ -223,8 +238,13 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, all_los
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
     
     """
 
@@ -270,8 +290,18 @@ def reg_logistic_regression_smart(y, tx, lambda_, initial_w, max_iters, gamma, e
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
+    
+    if all_losses == True and return_total_number_of_iterations == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights, 
+    total number of steps before achieving the desired predefined EPSILON precision
+    :rtype:  numpy array,  numpy array, int
     
     """
     loss = 0.0
@@ -330,7 +360,7 @@ def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, b
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
     
     """
