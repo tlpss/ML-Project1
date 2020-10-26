@@ -72,8 +72,7 @@ def normal_least_squares(y, tx):
     b = (tx.T).dot(y)
     
     #We solve the linear equation Aw = b
-    #w = np.linalg.solve(A,b)
-    w = np.matmul(np.linalg.pinv(A),b)
+    w = np.linalg.solve(A,b)
     
     mse = compute_mse(y, tx, w)
     
@@ -99,8 +98,7 @@ def ridge_regression(y, tx, lambda_):
     b = tx.T.dot(y)
     
     #We solve the linear equation Aw = b
-    #w_ridge = np.linalg.solve(A,b)
-    w_ridge = np.matmul(np.linalg.pinv(A),b)
+    w_ridge = np.linalg.solve(A,b)
     
     ridge_mse  = compute_ridge_loss(y, tx, w_ridge , lambda_)
     
