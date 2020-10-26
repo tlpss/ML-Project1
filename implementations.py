@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, calculate_sigmoid, hypothesis_gradient, compute_sigmoid_gradient, compute_logistic_regression_loss
+from helpers.implementation_helpers import compute_mse, compute_gradient, compute_ridge_loss, sigmoid, gradient_of_logistic_regression, loss_of_logistic_regression
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """ performs linear regression using Gradient Descent
@@ -50,7 +50,6 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
         batch_tx = tx[batch_indices]
         #compute gradient on batch
         gradient = compute_gradient(batch_y,batch_tx,w)
-        #print(f"gradient = {gradient}")
         # update w
         w = w - gamma*gradient
     
@@ -105,7 +104,7 @@ def ridge_regression(y, tx, lambda_):
     
     return w_ridge , ridge_mse
     
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, all_losses=False):
     """
     #Logistic regression using gradient descent
     
@@ -124,26 +123,99 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
     
-    """
+    if all_losses == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
     
-    # number of features
-    D = np.shape(tx)[1]
-    # Define parameters to store weights and the value of the loss(cost) funcion
+    """
     loss = 0.0
     w = initial_w
+    losses = [] 
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(y, tx, w)
-        # update weights accordint to the BGD
+        gradient = gradient_of_logistic_regression(tx,y,w)
+        if all_losses:
+            losses.append(loss_of_logistic_regression(tx,y,w))
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w)
+    loss = loss_of_logistic_regression(tx,y,w)
+    
+    if all_losses:
+        return w, losses
     return w, loss
+def logistic_regression_smart(y, tx, initial_w, max_iters, gamma, epsilon, all_losses= False, return_total_number_of_iterations = False):
+    """
+    #Logistic regression using gradient descent with smart features,
+    that will stop if the absolute difference of two consecutive values
+    of the loss function is smaller than desired argument called epsilon
+    
+    :param y: labels
+    :type y: numpy 1D array
+    
+    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
+    :type tx: numpy 2D array
+    
+    :param initial_w: initial value of weights
+    :type initial_w: numpy 1D array
+    
+    :param max_iters: the number of maximal iterations
+    :type max_iters: int
+    
+    :param gamma: learning rate
+    :type gamma: float64
+    
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
+    :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
+    
+    if all_losses == True and return_total_number_of_iterations == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights, 
+    total number of steps before achieving the desired predefined EPSILON precision
+    :rtype:  numpy array,  numpy array, int
+    
+    """
+    loss = 0.0
+    w = initial_w
+    losses = []
+    prev_loss = loss_of_logistic_regression(tx,y,w)
+    total_number_of_iteratiorns = max_iters
+    for n_iter in range(max_iters):
+        # compute the gradient at the given point
+        gradient = gradient_of_logistic_regression(tx,y,w)
+        # calculate the current value of the loss function
+        current_loss = loss_of_logistic_regression(tx,y,w)
+        # save the current value of the loss function
+        losses.append(current_loss)
+        # update weights
+        w = w - gamma * gradient
+        # calculate the differences between two consecutive values
+        # of the loss functions, and if it is less than defined
+        # epsilon then break because we reached desired precision
+        if (abs(current_loss - prev_loss) <= epsilon):
+            total_number_of_iteratiorns = n_iter
+            break
+        prev_loss = current_loss
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    if return_total_number_of_iterations and all_losses:
+        return w, losses, total_number_of_iteratiorns
+    
+    if all_losses:
+        return w, losses
+    else:
+        # calculate the final loss function
+        loss = loss_of_logistic_regression(tx,y,w)
+        
+        return w, loss
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, all_losses=False):
     """
     #Regularized logistic regression using gradient descent
     
@@ -166,24 +238,104 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
     
     """
-    
-    # number of features
-    D = np.shape(tx)[1]
+
     # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
-    w = np.zeros(D)
+    w = initial_w
+    losses = [] 
     for n_iter in range(max_iters):
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(y, tx, w, lambda_)
+        gradient = gradient_of_logistic_regression(tx,y,w,lambda_)
         # update weights accordint to the BGD
         w = w - gamma * gradient
+        losses.append(loss_of_logistic_regression(tx,y,w))
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
+    loss = loss_of_logistic_regression(tx,y,w,lambda_)
+    if all_losses:
+        return w, losses
+    
     return w, loss
+
+def reg_logistic_regression_smart(y, tx, lambda_, initial_w, max_iters, gamma, epsilon, all_losses= False, return_total_number_of_iterations = False):
+    """
+    #Reg. Logistic regression using gradient descent with smart feature,
+    that will stop if the absolute difference of two consecutive values
+    of the loss function is smaller than desired argument called epsilon
+    
+    :param y: labels
+    :type y: numpy 1D array
+    
+    :param lambda_: trade-off parameter (how big part of the loss/cost function to give to regularization function)
+    :type lambda_: float64
+    
+    
+    :param tx: extended (contains bias column) feature matrix, where each row is a datapoint and each          column a feature
+    :type tx: numpy 2D array
+    
+    :param initial_w: initial value of weights
+    :type initial_w: numpy 1D array
+    
+    :param max_iters: the number of maximal iterations
+    :type max_iters: int
+    
+    :param gamma: learning rate
+    :type gamma: float64
+    
+    if all_losses == False
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
+    :rtype:  numpy array,  float64
+        
+    if all_losses == True and return_total_number_of_iterations == False
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights
+    :rtype:  numpy array,  numpy array
+    
+    if all_losses == True and return_total_number_of_iterations == True
+    :return: trained weights , all values of the loss/cost function per step/iteration of training before the update rule is applied to the weights, 
+    total number of steps before achieving the desired predefined EPSILON precision
+    :rtype:  numpy array,  numpy array, int
+    
+    """
+    loss = 0.0
+    w = initial_w
+    losses = []
+    prev_loss = loss_of_logistic_regression(tx,y,w,lambda_)
+    total_number_of_iteratiorns = max_iters
+    for n_iter in range(max_iters):
+        # compute the gradient at the given point
+        gradient = gradient_of_logistic_regression(tx,y,w,lambda_)
+        # update weights
+        w = w - gamma * gradient
+        # calculate the current value of the loss function
+        current_loss = loss_of_logistic_regression(tx,y,w,lambda_)
+        # save the current value of the loss function
+        losses.append(current_loss)
+        # calculate the differences between two consecutive values
+        # of the loss functions, and if it is less than defined
+        # epsilon then break because we reached desired precision
+        if (abs(current_loss - prev_loss) <= epsilon):
+            total_number_of_iteratiorns = n_iter
+            break
+        prev_loss = current_loss
+    
+    
+    if return_total_number_of_iterations and all_losses:
+        return w, losses, total_number_of_iteratiorns
+    
+    if all_losses:
+        return w, losses
+    else:
+        # calculate the final loss function
+        loss = loss_of_logistic_regression(tx,y,w,lambda_)
+        return w, loss
 
 def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size):
     """
@@ -208,25 +360,43 @@ def reg_batch_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, b
     :param gamma: learning rate
     :type gamma: float64
     
-    :return: ws (), losses (the value of the loss function at the end of learning)
+    :return: trained weights , value of the loss/cost function at the last step (the value of the loss function at the end of learning)
     :rtype:  numpy array,  float64
     
     """
     n = len(y)
-    
-    # number of features
-    D = np.shape(tx)[1]
     # Define parameters to store weights and the value of the loss(cost) funcion
     loss = 0.0
-    w = np.zeros(D)
+    w = initial_w
     for n_iter in range(max_iters):
         batch_indices = np.random.randint(n,size=batch_size)
         batch_y = y[batch_indices]
         batch_tx = tx[batch_indices]
         # compute the gradient at the given point
-        gradient = compute_sigmoid_gradient(batch_y, batch_tx, w, lambda_)
+        gradient = gradient_of_logistic_regression(batch_tx,batch_y,w,lambda_)
         # update weights accordint to the BGD
         w = w - gamma * gradient
     # calculate loss function
-    loss = compute_logistic_regression_loss(y, tx, w, lambda_)
+    loss = loss_of_logistic_regression(tx,y,w,lambda_)
     return w, loss
+
+def confusion_matrix(y,y_hat):
+    """
+    returns confusion matrix for the labels and predicitons of a binary classifier
+
+    TN | FP
+    FN | TP 
+
+    where all values are normalized wrt to the occurance of the true labels so that all rows sum up to 1
+
+    :param y: labels of the datapoints (1 or 0)
+    :type y: np 1d array
+    :param y_hat: predicted labels of the datapoints (1 or 0)
+    :type y_hat: np 1d array 
+    """
+
+    confusion = 2*y + y_hat
+    confusion_matrix = [np.count_nonzero(confusion==i) for i in range(4)]
+    confusion_matrix = np.array(confusion_matrix).reshape((2,2))
+    confusion_matrix = confusion_matrix/ np.sum(confusion_matrix,axis=1).reshape((-1,1))
+    return confusion_matrix

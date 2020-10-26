@@ -28,12 +28,14 @@ class Preprocessing:
         self._split_predictions_and_make_unstructured(labeled=labeled)
         if replace_missing_by_mean:
             self._replace_missing_by_mean()
+            
+        self._feature_transformation()
         
-        self._feature_engineering()
+        self._standardize_columns()
 
+        self._feature_engineering()
         if outlier_removal:
             self._remove_outliers()
-        self._normalize_columns()
         self._add_bias_column_and_create_tX()
 
         if save_y_and_tX:
@@ -76,17 +78,60 @@ class Preprocessing:
 
     def _remove_outliers(self):
         raise NotImplementedError
+    
+    def _feature_transformation(self):
+        ''' Method to be implemented by subclasses'''
+        pass
 
     def _feature_engineering(self):
         ''' Method to be implemented by subclasses'''
         pass
 
-    def _normalize_columns(self):
+    def _standardize_columns(self):
         self.dataset = (self.dataset- np.mean(self.dataset, axis = 0)) / np.std(self.dataset, axis = 0)
 
     def _add_bias_column_and_create_tX(self):
         bias_vec = np.ones((self.dataset.shape[0],1))
         self.tX = np.concatenate((bias_vec,self.dataset), axis = 1)
+
+
+class PolyPreprocessing(Preprocessing):
+    def __init__(self,dataset):
+        super().__init__(dataset)
+        self.degree = None
+        self.cross_degree = None
+        
+    def set_degrees(self,degree, cross_degree):
+        self.degree = degree
+        self.cross_degree = cross_degree
+        
+    def _feature_engineering(self):
+        super()._feature_engineering() # to create pipeline
+        
+        dataset =self.dataset
+        
+        for deg in range(2,self.degree+1):
+            self.dataset = np.concatenate((self.dataset, np.power(dataset,deg)),axis=1)
+        
+        if (self.cross_degree):
+            for col_i in range(dataset.shape[1]):
+                print(col_i)
+                for col_j in range(col_i+1,dataset.shape[1]):
+                    col = dataset[:,col_i]*dataset[:,col_j]
+                    self.dataset = np.concatenate((self.dataset,col.reshape((-1,1))),axis=1)
+
+                    
+class AddFeaturesPolyPreprocessing(PolyPreprocessing):
+    def __init__(self,dataset):
+        super().__init__(dataset)
+    def _feature_engineering(self):
+        super()._feature_engineering()
+        X = np.array(self.original_dataset.tolist()) # make unstructured, not very efficient..
+        X = X[:,2:] # remove IDs and '?' of predictions
+        col = X[:,1]
+        f1 = col = 1-np.exp(-col**2/5000).reshape((-1,1))
+        self.dataset = np.concatenate((self.dataset,f1),axis=1)  
+
 
 if __name__ == "__main__":
     """ example usage"""

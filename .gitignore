@@ -4,4 +4,8 @@
 **.png
 venv/
 
+dataset/test.csv
 test/test_write.csv
+models/**.csv
+
+**.p
